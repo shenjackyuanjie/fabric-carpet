@@ -826,6 +826,8 @@ public class CarpetEventServer
                 handler.call( () -> Arrays.asList(new EntityValue(player), new StringValue(message)), player::getCommandSource);
             }
         };
+        public static final PlayerCommandEvent PLAYER_COMMAND = new PlayerCommandEvent();
+
         public static final Event STATISTICS = new Event("statistic", 4, false)
         {
             private <T> Identifier getStatId(Stat<T> stat)

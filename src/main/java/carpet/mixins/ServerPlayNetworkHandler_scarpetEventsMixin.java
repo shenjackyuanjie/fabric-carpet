@@ -25,6 +25,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import static carpet.script.CarpetEventServer.Event.PLAYER_ATTACKS_ENTITY;
 import static carpet.script.CarpetEventServer.Event.PLAYER_CLICKS_BLOCK;
+import static carpet.script.CarpetEventServer.Event.PLAYER_COMMAND;
 import static carpet.script.CarpetEventServer.Event.PLAYER_DEPLOYS_ELYTRA;
 import static carpet.script.CarpetEventServer.Event.PLAYER_DROPS_ITEM;
 import static carpet.script.CarpetEventServer.Event.PLAYER_DROPS_STACK;
@@ -50,6 +51,21 @@ import static carpet.script.CarpetEventServer.Event.PLAYER_WAKES_UP;
 public class ServerPlayNetworkHandler_scarpetEventsMixin
 {
     @Shadow public ServerPlayerEntity player;
+
+    // Deliberately intercept command execution, not onGameMessage/onChatMessage.
+    // Returning here preserves the enclosing packet handler's checks/accounting.
+    // This 1.16.5 hook must not be transplanted to modern signed-chat packet heads:
+    // see gnembon/fabric-carpet#1740 (signed command arguments and signature state).
+    @Inject(method = "executeCommand", at = @At("HEAD"), cancellable = true)
+    private void onPlayerCommand(String command, CallbackInfo ci)
+    {
+        if (PLAYER_COMMAND.isNeeded() && PLAYER_COMMAND.onCommand(player,
+                command.startsWith("/") ? command.substring(1) : command))
+        {
+            ci.cancel();
+        }
+    }
+
 
     @Inject(method = "onPlayerInput", at = @At(value = "INVOKE", target = "Lnet/minecraft/server/network/ServerPlayerEntity;method_14218(FFZZ)V"))
     private void checkMoves(PlayerInputC2SPacket p, CallbackInfo ci)

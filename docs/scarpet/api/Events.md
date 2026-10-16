@@ -254,6 +254,35 @@ Triggered when the player has successfully logged in and was placed in the game.
 ### `__on_player_disconnects(player, reason)`
 Triggered when a player sends a disconnect package or is forcefully disconnected from the server.
 
+### `__on_player_command(player, command)`
+Triggered before the server executes a command received from a player. `command`
+is the command text without its leading `/`.
+
+Returning the exact string `'cancel'` prevents execution. Other return values,
+including `true`, `false`, and `null`, do not cancel. All applicable callbacks
+are notified; one cancellation is sufficient even if later callbacks allow it.
+Global apps and the issuing player's instance of player-scoped apps are notified.
+The template instance of a player-scoped app is not executed.
+
+```scarpet
+__on_player_command(player, command) ->
+    if(command == 'say carpet_cancel_probe', 'cancel', null);
+```
+
+This 1.16.5 backport hooks the player's network handler's `executeCommand`, not
+the generic command manager or the whole chat packet. Console, command block,
+function and Scarpet `run()` commands do not trigger it. Calling
+`signal_event('player_command', ...)` only signals callbacks; it has no command
+to cancel and retains the normal `signal_event` return contract.
+
+The original cancellation proposal, [PR #1740](https://github.com/gnembon/fabric-carpet/pull/1740),
+was not merged as of upstream commit `5c90d4844337b7efdf55a688cf55aaad337a1201`.
+Its review warns that cancelling modern chat-command packets at their head can
+break signed arguments (for example `/tell`). Minecraft 1.16.5 predates that
+signed-chat protocol. Do not reuse this injection on a modern version without
+preserving its signature validation and acknowledgement/state handling.
+No other event receives cancellation support in this backport.
+
 ### `__on_statistic(player, category, event, value)`
 Triggered when a player statistic changes. Doesn't notify on periodic an rhythmic events, i.e. 
 `time_since_death`, `time_since_rest`, and `played_one_minute` since these are triggered every tick. Event 
