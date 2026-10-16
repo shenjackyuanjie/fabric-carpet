@@ -485,6 +485,13 @@ public class SettingsManager
         {
             if (rule.name.toLowerCase(Locale.ROOT).contains(lcSearch)) return true; // substring match, case insensitive
             for (String c : rule.categories) if (c.equals(search)) return true; // category exactly, case sensitive
+            if (Translations.matchesTranslation("rule." + rule.name + ".name", lcSearch)
+                    || Translations.matchesTranslation("rule." + rule.name + ".desc", lcSearch)) return true;
+            for (String c : rule.categories)
+            {
+                String key = "category." + c;
+                if (Translations.hasTranslation(key) && tr(key).equalsIgnoreCase(search)) return true;
+            }
             return Sets.newHashSet(rule.description.toLowerCase(Locale.ROOT).split("\\W+")).contains(lcSearch); // contains full term in description, but case insensitive
         }).sorted().collect(ImmutableList.toImmutableList());
     }
@@ -602,7 +609,7 @@ public class SettingsManager
         String displayName = rule.translatedName();
 
         Messenger.m(source, "");
-        Messenger.m(source, "wb "+ displayName ,"!/"+identifier+" "+rule.name,"^g refresh");
+        Messenger.m(source, "wb "+ displayName ,"!/"+identifier+" "+rule.name,"^g " + tr("ui.refresh", "refresh"));
         Messenger.m(source, "w "+ rule.translatedDescription());
 
         rule.translatedExtras().forEach(s -> Messenger.m(source, "g  "+s));
@@ -612,15 +619,15 @@ public class SettingsManager
         for (String t: rule.categories)
         {
             String translated = tr("category." + t, t);
-            tags.add(Messenger.c("c ["+ translated +"]", "^g "+ String.format(tr("list_all_%s_settings","list all %s settings"), translated),"!/"+identifier+" list "+t));
+            tags.add(Messenger.c("c ["+ translated +"]", "^g "+ String.format(tr("ui.list_all_%(cat)s_settings","list all %s settings"), translated),"!/"+identifier+" list "+t));
             tags.add(Messenger.c("w , "));
         }
         tags.remove(tags.size()-1);
         Messenger.m(source, tags.toArray(new Object[0]));
 
-        Messenger.m(source, "w "+ tr("ui.current_value", "Current value")+": ",String.format("%s %s (%s value)",rule.getBoolValue()?"lb":"nb", rule.getAsString(),rule.isDefault()?"default":"modified"));
+        Messenger.m(source, "w "+ tr("ui.current_value", "Current value")+": ",String.format("%s %s (%s)",rule.getBoolValue()?"lb":"nb", rule.getAsString(),rule.isDefault()?tr("ui.default_value", "default value"):tr("ui.modified_value", "modified value")));
         List<BaseText> options = new ArrayList<>();
-        options.add(Messenger.c("w Options: ", "y [ "));
+        options.add(Messenger.c("w " + tr("ui.options", "Options") + ": ", "y [ "));
         for (String o: rule.options)
         {
             options.add(makeSetRuleButton(rule, o, false));
@@ -703,7 +710,7 @@ public class SettingsManager
             return Messenger.c(baseText, "^g "+fancyName+" " + tr("ui.settings_are_locked","settings are locked"));
         if (option.equalsIgnoreCase(rule.getAsString()))
             return Messenger.c(baseText);
-        return Messenger.c(baseText, "^g "+ tr("ui.switch_to","Switch to") +" " + option+(option.equalsIgnoreCase(rule.defaultAsString)?" (default)":""), "?/"+identifier+" " + rule.name + " " + option);
+        return Messenger.c(baseText, "^g "+ tr("ui.switch_to","Switch to") +" " + option+(option.equalsIgnoreCase(rule.defaultAsString)?" (" + tr("ui.default", "default") + ")":""), "?/"+identifier+" " + rule.name + " " + option);
     }
 
     private int listSettings(ServerCommandSource source, String title, Collection<ParsedRule<?>> settings_list)

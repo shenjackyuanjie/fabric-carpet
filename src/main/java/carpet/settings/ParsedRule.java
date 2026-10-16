@@ -147,7 +147,7 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         }
         else
         {
-            Messenger.m(source, "r Unknown type " + type.getSimpleName());
+            Messenger.m(source, "r " + String.format(tr("ui.unknown_type", "Unknown type %s"), type.getSimpleName()));
             return null;
         }
     }
@@ -178,7 +178,7 @@ public final class ParsedRule<T> implements Comparable<ParsedRule> {
         }
         catch (IllegalAccessException e)
         {
-            Messenger.m(source, "r Unable to access setting for  "+name);
+            Messenger.m(source, "r " + String.format(tr("ui.setting_access_failed", "Unable to access setting for  %s"), name));
             return null;
         }
         return this;

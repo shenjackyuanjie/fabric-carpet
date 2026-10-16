@@ -1,0 +1,9 @@
+{
+  "source_commit": "eaad77fcef460c95054a593d83b8906ff0541e84",
+  "rules": "e50d9dad661ecb250441b1e96ebb3aad81b6505e8baa61b6bc390c3da4ddbaf7",
+  "commands": {
+    "carpet/commands/LogCommand.java": "922f7ad4c94fb2ac597013b573371b3b161332cd6dd3612bc25a30262e0a8bd9",
+    "carpet/commands/PlayerCommand.java": "6f201294730bce2f9b952894d965e8906d1ef7bcbc7b6693b8b28257bd1f1114",
+    "carpet/settings/SettingsManager.java": "8d219f102e632b6b3bfb9b286c96dae871944e5a78fbb7341501ab5274dff5f2"
+  }
+}

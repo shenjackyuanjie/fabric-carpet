@@ -331,7 +331,6 @@
   "command.log.player_subscribed": "%s 已订阅 %s",
   "command.log.player_unsubscribed": "%s 已取消订阅 %s",
   "command.log.subscribed": "已订阅 %s",
-  "command.player.not_found": "找不到玩家 %s",
   "command.player.not_allowed": "只有管理员才能控制其他真实玩家",
   "command.player.fake_only": "只能移动或移除假人",
   "command.player.already_online": "玩家 %s 已经在线",
@@ -341,5 +340,7 @@
   "command.player.name_too_long": "玩家名称 %s 过长",
   "command.player.outside_world": "不能将玩家 %s 放置在世界边界之外",
   "command.player.cannot_spawn_online": "玩家 %s 不存在，无法在在线模式下生成；请检查玩家名称及 allowSpawningOfflinePlayers 设置",
-  "command.player.cannot_shadow_fake": "不能为假人创建影子玩家"
+  "command.player.cannot_shadow_fake": "不能为假人创建影子玩家",
+  "command.player.existing_only": "只能操作已经在线的玩家",
+  "validator.app_store": "应用仓库链接应指向有效的 GitHub 仓库"
 }

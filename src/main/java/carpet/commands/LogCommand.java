@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static carpet.utils.Translations.tr;
 import static com.mojang.brigadier.arguments.StringArgumentType.getString;
 import static net.minecraft.command.CommandSource.suggestMatching;
 
@@ -73,7 +74,7 @@ public class LogCommand
         }
         catch (CommandSyntaxException e)
         {
-            Messenger.m(source, "For players only");
+            Messenger.m(source, "w " + tr("command.log.players_only", "For players only"));
             return 0;
         }
         Map<String,String> subs = LoggerRegistry.getPlayerSubscriptions(source.getName());
@@ -84,7 +85,7 @@ public class LogCommand
         List<String> all_logs = new ArrayList<>(LoggerRegistry.getLoggerNames());
         Collections.sort(all_logs);
         Messenger.m(player, "w _____________________");
-        Messenger.m(player, "w Available logging options:");
+        Messenger.m(player, "w " + tr("command.log.available", "Available logging options:"));
         for (String lname: all_logs)
         {
             List<Object> comp = new ArrayList<>();
@@ -96,12 +97,12 @@ public class LogCommand
             {
                 if (subs.containsKey(lname))
                 {
-                    comp.add("l Subscribed ");
+                    comp.add("l " + tr("command.log.subscribed_button", "Subscribed") + " ");
                 }
                 else
                 {
-                    comp.add(color + " [Subscribe] ");
-                    comp.add("^w subscribe to " + lname);
+                    comp.add(color + " [" + tr("command.log.subscribe_button", "Subscribe") + "] ");
+                    comp.add("^w " + String.format(tr("command.log.subscribe_tooltip", "subscribe to %s"), lname));
                     comp.add("!/log " + lname);
                 }
             }
@@ -115,7 +116,7 @@ public class LogCommand
                     } else
                     {
                         comp.add(color + " [" + option + "] ");
-                        comp.add("^w subscribe to " + lname + " " + option);
+                        comp.add("^w " + String.format(tr("command.log.subscribe_tooltip", "subscribe to %s"), lname + " " + option));
                         comp.add("!/log " + lname + " " + option);
                     }
 
@@ -124,7 +125,7 @@ public class LogCommand
             if (subs.containsKey(lname))
             {
                 comp.add("nb [X]");
-                comp.add("^w Click to unsubscribe");
+                comp.add("^w " + tr("command.log.unsubscribe_tooltip", "Click to unsubscribe"));
                 comp.add("!/log "+lname);
             }
             Messenger.m(player,comp.toArray(new Object[0]));
@@ -136,14 +137,14 @@ public class LogCommand
         PlayerEntity player = source.getMinecraftServer().getPlayerManager().getPlayer(player_name);
         if (player == null)
         {
-            Messenger.m(source, "r No player specified");
+            Messenger.m(source, "r " + tr("command.log.no_player", "No player specified"));
             return 0;
         }
         for (String logname : LoggerRegistry.getLoggerNames())
         {
             LoggerRegistry.unsubscribePlayer(player_name, logname);
         }
-        Messenger.m(source, "gi Unsubscribed from all logs");
+        Messenger.m(source, "gi " + tr("command.log.unsubscribed_all", "Unsubscribed from all logs"));
         return 1;
     }
     private static int unsubFromLogger(ServerCommandSource source, String player_name, String logname)
@@ -151,16 +152,16 @@ public class LogCommand
         PlayerEntity player = source.getMinecraftServer().getPlayerManager().getPlayer(player_name);
         if (player == null)
         {
-            Messenger.m(source, "r No player specified");
+            Messenger.m(source, "r " + tr("command.log.no_player", "No player specified"));
             return 0;
         }
         if (LoggerRegistry.getLogger(logname) == null)
         {
-            Messenger.m(source, "r Unknown logger: ","rb "+logname);
+            Messenger.m(source, "r " + tr("command.log.unknown_logger", "Unknown logger: "),"rb "+logname);
             return 0;
         }
         LoggerRegistry.unsubscribePlayer(player_name, logname);
-        Messenger.m(source, "gi Unsubscribed from "+logname);
+        Messenger.m(source, "gi " + String.format(tr("command.log.unsubscribed", "Unsubscribed from %s"), logname));
         return 1;
     }
 
@@ -169,22 +170,22 @@ public class LogCommand
         PlayerEntity player = source.getMinecraftServer().getPlayerManager().getPlayer(player_name);
         if (player == null)
         {
-            Messenger.m(source, "r No player specified");
+            Messenger.m(source, "r " + tr("command.log.no_player", "No player specified"));
             return 0;
         }
         if (LoggerRegistry.getLogger(logName) == null)
         {
-            Messenger.m(source, "r Unknown logger: ","rb "+logName);
+            Messenger.m(source, "r " + tr("command.log.unknown_logger", "Unknown logger: "),"rb "+logName);
             return 0;
         }
         boolean subscribed = LoggerRegistry.togglePlayerSubscription(player_name, logName);
         if (subscribed)
         {
-            Messenger.m(source, "gi "+player_name+" subscribed to " + logName + ".");
+            Messenger.m(source, "gi " + String.format(tr("command.log.player_subscribed", "%s subscribed to %s."), player_name, logName));
         }
         else
         {
-            Messenger.m(source, "gi "+player_name+" unsubscribed from " + logName + ".");
+            Messenger.m(source, "gi " + String.format(tr("command.log.player_unsubscribed", "%s unsubscribed from %s."), player_name, logName));
         }
         return 1;
     }
@@ -193,22 +194,22 @@ public class LogCommand
         PlayerEntity player = source.getMinecraftServer().getPlayerManager().getPlayer(player_name);
         if (player == null)
         {
-            Messenger.m(source, "r No player specified");
+            Messenger.m(source, "r " + tr("command.log.no_player", "No player specified"));
             return 0;
         }
         if (LoggerRegistry.getLogger(logname) == null)
         {
-            Messenger.m(source, "r Unknown logger: ","rb "+logname);
+            Messenger.m(source, "r " + tr("command.log.unknown_logger", "Unknown logger: "),"rb "+logname);
             return 0;
         }
         LoggerRegistry.subscribePlayer(player_name, logname, option);
         if (option!=null)
         {
-            Messenger.m(source, "gi Subscribed to " + logname + "(" + option + ")");
+            Messenger.m(source, "gi " + String.format(tr("command.log.subscribed", "Subscribed to %s"), logname + "(" + option + ")"));
         }
         else
         {
-            Messenger.m(source, "gi Subscribed to " + logname);
+            Messenger.m(source, "gi " + String.format(tr("command.log.subscribed", "Subscribed to %s"), logname));
         }
             return 1;
     }

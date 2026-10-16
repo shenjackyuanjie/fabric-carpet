@@ -30,6 +30,8 @@ import java.util.Iterator;
 import java.util.Locale;
 import java.util.Optional;
 
+import static carpet.utils.Translations.tr;
+
 import static carpet.settings.RuleCategory.BUGFIX;
 import static carpet.settings.RuleCategory.COMMAND;
 import static carpet.settings.RuleCategory.CREATIVE;
@@ -64,7 +66,7 @@ public class CarpetSettings
             }
             if (!Translations.isValidLanguage(newValue))
             {
-                Messenger.m(source, "r "+newValue+" is not a valid language");
+                Messenger.m(source, "r " + String.format(tr("validator.invalid_language", "%s is not a valid language"), newValue));
                 return null;
             }
             CarpetSettings.language = newValue;
@@ -158,7 +160,7 @@ public class CarpetSettings
             return (newValue > 0 && newValue <= 72000) ? newValue : null;
         }
         @Override
-        public String description() { return "You must choose a value from 1 to 72000";}
+        public String description() { return tr("validator.delay_range", "You must choose a value from 1 to 72000");}
     }
 
     @Rule(desc = "Dropping entire stacks works also from on the crafting UI result slot", category = {BUGFIX, SURVIVAL})
@@ -214,7 +216,7 @@ public class CarpetSettings
 
         @Override
         public String description() {
-            return "optimizedTNT must be enabled";
+            return tr("validator.optimized_tnt_required", "optimizedTNT must be enabled");
         }
     }
 
@@ -230,7 +232,7 @@ public class CarpetSettings
 
         @Override
         public String description() {
-            return "Cannot be negative, except for -1";
+            return tr("validator.tnt_random_range", "Cannot be negative, except for -1");
         }
     }
 
@@ -246,7 +248,7 @@ public class CarpetSettings
 
         @Override
         public String description() {
-            return "Must be between 0 and 2pi, or -1";
+            return tr("validator.tnt_angle", "Must be between 0 and 2pi, or -1");
         }
     }
 
@@ -423,7 +425,7 @@ public class CarpetSettings
             return newValue;
         }
         @Override
-        public String description() { return "When changing the rule, you must at least have the permission level you are trying to give it";}
+        public String description() { return tr("validator.module_permission", "When changing the rule, you must at least have the permission level you are trying to give it");}
     }
     @Rule(
             desc = "Enables restrictions for arbitrary code execution with scarpet",
@@ -515,7 +517,7 @@ public class CarpetSettings
             return (newValue>0 && newValue <= 1024) ? newValue : null;
         }
         @Override
-        public String description() { return "You must choose a value from 1 to 1024";}
+        public String description() { return tr("validator.push_limit", "You must choose a value from 1 to 1024");}
     }
     @Rule(
             desc = "Customizable piston push limit",
@@ -540,7 +542,7 @@ public class CarpetSettings
             return (newValue>0 && newValue <= 20000000) ? newValue : null;
         }
         @Override
-        public String description() { return "You must choose a value from 1 to 20M";}
+        public String description() { return tr("validator.fill_limit", "You must choose a value from 1 to 20M");}
     }
     @Rule(
             desc = "Customizable fill/clone volume limit",
@@ -617,7 +619,7 @@ public class CarpetSettings
             }
             if (newValue < 0 || newValue > 32)
             {
-                Messenger.m(source, "r view distance has to be between 0 and 32");
+                Messenger.m(source, "r " + tr("validator.view_distance_range", "view distance has to be between 0 and 32"));
                 return null;
             }
             MinecraftServer server = source.getMinecraftServer();
@@ -631,12 +633,12 @@ public class CarpetSettings
             }
             else
             {
-                Messenger.m(source, "r view distance can only be changed on a server");
+                Messenger.m(source, "r " + tr("validator.view_distance_server", "view distance can only be changed on a server"));
                 return 0;
             }
         }
         @Override
-        public String description() { return "You must choose a value from 0 (use server settings) to 32";}
+        public String description() { return tr("validator.view_distance", "You must choose a value from 0 (use server settings) to 32");}
     }
     @Rule(
             desc = "Changes the view distance of the server.",
@@ -665,7 +667,7 @@ public class CarpetSettings
             if (source == null) return newValue;
             if (newValue < 0 || newValue > 32)
             {
-                Messenger.m(source, "r spawn chunk size has to be between 0 and 32");
+                Messenger.m(source, "r " + tr("validator.spawn_chunks_range", "spawn chunk size has to be between 0 and 32"));
                 return null;
             }
             if (currentRule.get().intValue() == newValue.intValue())
@@ -707,7 +709,7 @@ public class CarpetSettings
             if (source == null) return newValue;
             if (newValue < 0)
             {
-                Messenger.m(source, "r light batch size has to be at least 0");
+                Messenger.m(source, "r " + tr("validator.light_batch_nonnegative", "light batch size has to be at least 0"));
                 return null;
             }
             if (currentRule.get().intValue() == newValue.intValue())
@@ -724,7 +726,7 @@ public class CarpetSettings
             }
             catch (IllegalAccessException e)
             {
-                Messenger.m(source, "r Unable to access setting for  "+currentRule.name);
+                Messenger.m(source, "r " + String.format(tr("ui.setting_access_failed", "Unable to access setting for  %s"), currentRule.name));
                 return null;
             }
             
@@ -861,7 +863,7 @@ public class CarpetSettings
 
         @Override
         public String description() {
-            return "You have to choose a value greater or equal to 48";
+            return tr("validator.structure_limit", "You have to choose a value greater or equal to 48");
         }
     }
     @Rule(
@@ -885,7 +887,7 @@ public class CarpetSettings
         public String validate(ServerCommandSource source, ParsedRule<String> currentRule, String newValue, String string) {
             Optional<Block> ignoredBlock = Registry.BLOCK.getOrEmpty(Identifier.tryParse(newValue));
             if (!ignoredBlock.isPresent()) {
-                Messenger.m(source, "r Unknown block '" + newValue + "'.");
+                Messenger.m(source, "r " + String.format(tr("validator.unknown_block", "Unknown block '%s'."), newValue));
                 return null;
             }
             structureBlockIgnoredBlock = ignoredBlock.get();
@@ -958,7 +960,7 @@ public class CarpetSettings
         }
         @Override
         public String description() {
-            return "Cannot be negative, can be true, false, or # > 0";
+            return tr("validator.update_suppression", "Cannot be negative, can be true, false, or # > 0");
         }
     }
 }

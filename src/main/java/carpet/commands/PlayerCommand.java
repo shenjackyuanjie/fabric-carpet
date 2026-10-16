@@ -40,6 +40,8 @@ import static net.minecraft.server.command.CommandManager.argument;
 import static net.minecraft.server.command.CommandManager.literal;
 import static net.minecraft.command.CommandSource.suggestMatching;
 
+import static carpet.utils.Translations.tr;
+
 public class PlayerCommand
 {
 
@@ -145,7 +147,7 @@ public class PlayerCommand
         PlayerEntity player = getPlayer(context);
         if (player == null)
         {
-            Messenger.m(context.getSource(), "r Can only manipulate existing players");
+            Messenger.m(context.getSource(), "r " + tr("command.player.existing_only", "Can only manipulate existing players"));
             return true;
         }
         PlayerEntity sendingPlayer;
@@ -162,7 +164,7 @@ public class PlayerCommand
         {
             if (sendingPlayer != player && !(player instanceof EntityPlayerMPFake))
             {
-                Messenger.m(context.getSource(), "r Non OP players can't control other real players");
+                Messenger.m(context.getSource(), "r " + tr("command.player.not_allowed", "Non OP players can't control other real players"));
                 return true;
             }
         }
@@ -174,7 +176,7 @@ public class PlayerCommand
         if (cantManipulate(context)) return true;
         PlayerEntity player = getPlayer(context);
         if (player instanceof EntityPlayerMPFake) return false;
-        Messenger.m(context.getSource(), "r Only fake players can be moved or killed");
+        Messenger.m(context.getSource(), "r " + tr("command.player.fake_only", "Only fake players can be moved or killed"));
         return true;
     }
 
@@ -186,7 +188,7 @@ public class PlayerCommand
         PlayerEntity player = manager.getPlayer(playerName);
         if (player != null)
         {
-            Messenger.m(context.getSource(), "r Player ", "rb " + playerName, "r  is already logged on");
+            Messenger.m(context.getSource(), "r " + String.format(tr("command.player.already_online", "Player %s is already logged on"), playerName));
             return true;
         }
         GameProfile profile = server.getUserCache().findByName(playerName);
@@ -194,8 +196,8 @@ public class PlayerCommand
         {
             if (!CarpetSettings.allowSpawningOfflinePlayers)
             {
-                Messenger.m(context.getSource(), "r Player "+playerName+" is either banned by Mojang, or auth servers are down. " +
-                        "Banned players can only be summoned in Singleplayer and in servers in off-line mode.");
+                Messenger.m(context.getSource(), "r " + String.format(tr("command.player.no_profile", "Player %s is either banned by Mojang, or auth servers are down. " +
+                        "Banned players can only be summoned in Singleplayer and in servers in off-line mode."), playerName));
                 return true;
             } else {
                 profile = new GameProfile(PlayerEntity.getOfflinePlayerUuid(playerName), playerName);
@@ -203,12 +205,12 @@ public class PlayerCommand
         }
         if (manager.getUserBanList().contains(profile))
         {
-            Messenger.m(context.getSource(), "r Player ", "rb " + playerName, "r  is banned on this server");
+            Messenger.m(context.getSource(), "r " + String.format(tr("command.player.banned", "Player %s is banned on this server"), playerName));
             return true;
         }
         if (manager.isWhitelistEnabled() && manager.isWhitelisted(profile) && !context.getSource().hasPermissionLevel(2))
         {
-            Messenger.m(context.getSource(), "r Whitelisted players can only be spawned by operators");
+            Messenger.m(context.getSource(), "r " + tr("command.player.whitelisted", "Whitelisted players can only be spawned by operators"));
             return true;
         }
         return false;
@@ -276,21 +278,21 @@ public class PlayerCommand
         String playerName = StringArgumentType.getString(context, "player");
         if (playerName.length()>maxPlayerLength(source.getMinecraftServer()))
         {
-            Messenger.m(context.getSource(), "rb Player name: "+playerName+" is too long");
+            Messenger.m(context.getSource(), "rb " + String.format(tr("command.player.name_too_long", "Player name: %s is too long"), playerName));
             return 0;
         }
 
         MinecraftServer server = source.getMinecraftServer();
         if (!World.isInBuildLimit(new BlockPos(pos.x, pos.y, pos.z)))
         {
-            Messenger.m(context.getSource(), "rb Player "+playerName+" cannot be placed outside of the world");
+            Messenger.m(context.getSource(), "rb " + String.format(tr("command.player.outside_world", "Player %s cannot be placed outside of the world"), playerName));
             return 0;
         }
         PlayerEntity player = EntityPlayerMPFake.createFake(playerName, server, pos.x, pos.y, pos.z, facing.y, facing.x, dimType, mode, flying);
         if (player == null)
         {
-            Messenger.m(context.getSource(), "rb Player " + StringArgumentType.getString(context, "player") + " doesn't exist " +
-                    "and cannot spawn in online mode. Turn the server offline to spawn non-existing players");
+            Messenger.m(context.getSource(), "rb " + String.format(tr("command.player.cannot_spawn_online", "Player %s doesn't exist " +
+                    "and cannot spawn in online mode. Turn the server offline to spawn non-existing players"), StringArgumentType.getString(context, "player")));
             return 0;
         }
         return 1;
@@ -332,7 +334,7 @@ public class PlayerCommand
         ServerPlayerEntity player = getPlayer(context);
         if (player instanceof EntityPlayerMPFake)
         {
-            Messenger.m(context.getSource(), "r Cannot shadow fake players");
+            Messenger.m(context.getSource(), "r " + tr("command.player.cannot_shadow_fake", "Cannot shadow fake players"));
             return 0;
         }
         ServerPlayerEntity sendingPlayer = null;

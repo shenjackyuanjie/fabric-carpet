@@ -10,10 +10,11 @@ import net.minecraft.server.command.ServerCommandSource;
 import org.apache.commons.io.IOUtils;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 
 public class Translations
 {
@@ -39,15 +40,20 @@ public class Translations
         return translationMap != null && translationMap.containsKey(key);
     }
 
+    /** Matches only translated text, never an English fallback or a missing key. */
+    public static boolean matchesTranslation(String key, String search)
+    {
+        return hasTranslation(key) && tr(key).toLowerCase(Locale.ROOT).contains(search.toLowerCase(Locale.ROOT));
+    }
+
     public static Map<String, String> getTranslationFromResourcePath(String path)
     {
         String dataJSON;
-        try
+        try (InputStream stream = Translations.class.getClassLoader().getResourceAsStream(path))
         {
-            dataJSON = IOUtils.toString(
-                    Objects.requireNonNull(Translations.class.getClassLoader().getResourceAsStream(String.format("assets/carpet/lang/%s.json", CarpetSettings.language))),
-                    StandardCharsets.UTF_8);
-        } catch (NullPointerException | IOException e) {
+            if (stream == null) return null;
+            dataJSON = IOUtils.toString(stream, StandardCharsets.UTF_8);
+        } catch (IOException e) {
             return null;
         }
         Gson gson = new GsonBuilder().enableComplexMapKeySerialization().create();

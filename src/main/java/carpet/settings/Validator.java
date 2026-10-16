@@ -8,6 +8,8 @@ import net.minecraft.server.command.ServerCommandSource;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
+import static carpet.utils.Translations.tr;
+
 public abstract class Validator<T>
 {
     /**
@@ -18,7 +20,7 @@ public abstract class Validator<T>
     public String description() {return null;}
     public void notifyFailure(ServerCommandSource source, ParsedRule<T> currentRule, String providedValue)
     {
-        Messenger.m(source, "r Wrong value for " + currentRule.name + ": " + providedValue);
+        Messenger.m(source, "r " + String.format(tr("validator.wrong_value", "Wrong value for %s: %s"), currentRule.name, providedValue));
     }
 
     public static class _COMMAND<T> extends Validator<T>
@@ -31,7 +33,7 @@ public abstract class Validator<T>
             return newValue;
         }
         @Override
-        public String description() { return "It has an accompanying command";}
+        public String description() { return tr("validator.command", "It has an accompanying command");}
     }
 
     public static class _CLIENT<T> extends Validator<T>
@@ -42,9 +44,9 @@ public abstract class Validator<T>
             return newValue;
         }
         @Override
-        public String description() { return "Its a client command so can be issued and potentially be effective when connecting to non-carpet/vanilla servers. " +
+        public String description() { return tr("validator.client", "Its a client command so can be issued and potentially be effective when connecting to non-carpet/vanilla servers. " +
                 "In these situations (on vanilla servers) it will only affect the executing player, so each player needs to type it" +
-                " separately for the desired effect";}
+                " separately for the desired effect");}
     }
 
     public static class _COMMAND_LEVEL_VALIDATOR extends Validator<String> {
@@ -52,14 +54,14 @@ public abstract class Validator<T>
         @Override public String validate(ServerCommandSource source, ParsedRule<String> currentRule, String newValue, String userString) {
             if (!OPTIONS.contains(userString.toLowerCase(Locale.ROOT)))
             {
-                Messenger.m(source, "r Valid options for command type rules is 'true' or 'false'");
-                Messenger.m(source, "r Optionally you can choose 'ops' to only allow operators");
-                Messenger.m(source, "r or provide a custom required permission level");
+                Messenger.m(source, "r " + tr("validator.command_boolean", "Valid options for command type rules is 'true' or 'false'"));
+                Messenger.m(source, "r " + tr("validator.command_ops", "Optionally you can choose 'ops' to only allow operators"));
+                Messenger.m(source, "r " + tr("validator.command_level", "or provide a custom required permission level"));
                 return null;
             }
             return userString.toLowerCase(Locale.ROOT);
         }
-        public String description() { return "Can be limited to 'ops' only, or a custom permission level";}
+        public String description() { return tr("validator.command_level_desc", "Can be limited to 'ops' only, or a custom permission level");}
     }
     
     public static class _SCARPET<T> extends Validator<T> {
@@ -69,7 +71,7 @@ public abstract class Validator<T>
             return newValue;
         }
         public String description() {
-            return "It controls an accompanying Scarpet App";
+            return tr("validator.scarpet", "It controls an accompanying Scarpet App");
         }
     }
 
@@ -78,11 +80,11 @@ public abstract class Validator<T>
         @Override
         public T validate(ServerCommandSource source, ParsedRule<T> currentRule, T newValue, String string)
         {
-            Messenger.m(source, "r "+currentRule.name+" is missing a few bits - we are still working on it.");
+            Messenger.m(source, "r " + String.format(tr("validator.wip", "%s is missing a few bits - we are still working on it."), currentRule.name));
             return newValue;
         }
         @Override
-        public String description() { return "A few bits still needs implementing - we are working on it";}
+        public String description() { return tr("validator.wip_desc", "A few bits still needs implementing - we are working on it");}
     }
     public static class _STRICT<T> extends Validator<T>
     {
@@ -91,7 +93,7 @@ public abstract class Validator<T>
         {
             if (!currentRule.options.contains(string))
             {
-                Messenger.m(source, "r Valid options: " + currentRule.options.toString());
+                Messenger.m(source, "r " + String.format(tr("validator.valid_options", "Valid options: %s"), currentRule.options.toString()));
                 return null;
             }
             return newValue;
@@ -106,7 +108,7 @@ public abstract class Validator<T>
             if (!currentRule.options.stream().map(s->s.toLowerCase(Locale.ROOT)).collect(Collectors.toSet())
                     .contains(string.toLowerCase(Locale.ROOT)))
             {
-                Messenger.m(source, "r Valid options (case insensitive): " + currentRule.options.toString());
+                Messenger.m(source, "r " + String.format(tr("validator.valid_options_ignorecase", "Valid options (case insensitive): %s"), currentRule.options.toString()));
                 return null;
             }
             return newValue;
@@ -121,7 +123,7 @@ public abstract class Validator<T>
             return newValue.doubleValue() >= 0 ? newValue : null;
         }
         @Override
-        public String description() { return "Must be a positive number";}
+        public String description() { return tr("validator.nonnegative", "Must be a non-negative number");}
     }
 
     public static class PROBABILITY <T extends Number> extends Validator<T>
@@ -132,6 +134,6 @@ public abstract class Validator<T>
             return (newValue.doubleValue() >= 0 && newValue.doubleValue() <= 1 )? newValue : null;
         }
         @Override
-        public String description() { return "Must be between 0 and 1";}
+        public String description() { return tr("validator.probability", "Must be between 0 and 1");}
     }
 }

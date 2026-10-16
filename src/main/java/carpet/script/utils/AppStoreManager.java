@@ -72,7 +72,7 @@ public class AppStoreManager
             return newValue;
         }
         @Override
-        public String description() { return "Appstore link should point to a valid github repository";}
+        public String description() { return carpet.utils.Translations.tr("validator.app_store", "Appstore link should point to a valid github repository");}
     }
 
     public static class StoreNode
